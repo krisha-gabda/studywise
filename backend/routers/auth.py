@@ -3,7 +3,7 @@ from schemas import UserRegister, UserLogin, TokenResponse, UserResponse
 from db.database import AsyncSession, get_db
 from sqlalchemy import select
 from models.user import User
-from utils.auth import hash_password, create_jwt_token, verify_password
+from utils.auth import hash_password, create_jwt_token, verify_password, get_current_user
 
 router = APIRouter()
 
@@ -45,3 +45,8 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
         access_token=jwt_token,
         user=UserResponse.model_validate(user)
     )
+
+
+@router.get('/me')
+async def me(current_user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(current_user)
