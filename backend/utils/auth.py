@@ -1,14 +1,14 @@
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timezone, timedelta
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException
 from config import get_settings
 from db.database import AsyncSession, get_db
 from sqlalchemy import select
 from models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
+bearer_scheme = HTTPBearer()
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 def hash_password(password: str) -> str:
@@ -41,10 +41,11 @@ def decode_jwt_token(token: str) -> str:
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db)
 ):
     # token is automatically extracted from the Authorization header
+    token = credentials.credentials
     payload = decode_jwt_token(token)
     user_id = payload.get('sub')
 

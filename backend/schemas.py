@@ -70,7 +70,7 @@ class TopicResponse(BaseModel):
 
 # Notes Upload
 class NotesUploadResponse(BaseModel):
-    messsage: str
+    message: str
     topics_extracted: list[str]
 
 # Flashcards
