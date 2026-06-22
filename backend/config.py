@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # RAG Pipeline
     CHUNK_SIZE: int = 500       # tokens per chunk
-    CHUNK_OVERLAO: int = 50     # overlap between chunks
+    CHUNK_OVERLAP: int = 50     # overlap between chunks
     TOP_K_CHUNKS: int = 5       # chunks retrieved per query
 
     # File upoads

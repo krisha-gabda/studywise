@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from db.database import engine, Base
 from config import get_settings
 from routers.auth import router as auth_router
+from routers.notes import router as notes_router
 
 app = FastAPI(title='Studywise')
 
@@ -30,7 +31,7 @@ async def startup():
 # Sessions -        /api/session
 
 app.include_router(auth_router, prefix='/api/auth', tags=['auth'])
-# app.include_router(notes_router, prefix='/api/notes', tags=['notes'])
+app.include_router(notes_router, prefix='/api/notes', tags=['notes'])
 # app.include_router(roadmap_router, prefix='/api/roadmap', tags=['roadmap'])
 # app.include_router(study_router, prefix='/api/study', tags=['study'])
 # app.include_router(session_router, prefix='/api/session', tags=['session'])

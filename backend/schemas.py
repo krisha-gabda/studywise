@@ -69,6 +69,9 @@ class TopicResponse(BaseModel):
 
 
 # Notes Upload
+class NotesUploadResponse(BaseModel):
+    messsage: str
+    topics_extracted: list[str]
 
 # Flashcards
 

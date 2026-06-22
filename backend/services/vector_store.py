@@ -11,7 +11,7 @@ def get_collection():
     return collection
 
 
-def store_chunks(user_id, topic_name, chunks, embeddings):
+def store_chunks(user_id: str, topic_name: str, chunks: list[str], embeddings: list[float]):
     collection = get_collection()
 
     ids = [f'{user_id}_{topic_name}_{i}_{uuid.uuid4()}' for i in range(len(chunks))]
@@ -28,7 +28,7 @@ def store_chunks(user_id, topic_name, chunks, embeddings):
     )
 
 
-def query_chunks(user_id, query_text, top_k):
+def query_chunks(user_id: str, query_text: str, top_k: int):
     embeddings = embed_text(text=query_text, task_type='RETRIEVAL_QUERY')
     collection = get_collection()
 
