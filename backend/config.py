@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Gemini
     GEMINI_API_KEY: str
     GEMINI_LLM_MODEL: str = 'gemini-3.5-flash'
-    GEMINI_EMBEDDING_MODEL: str = 'models/text-embedding-001'
+    GEMINI_EMBEDDING_MODEL: str = 'gemini-embedding-001'
 
     # Database
     DATABASE_URL: str
