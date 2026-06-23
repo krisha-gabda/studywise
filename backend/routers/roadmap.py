@@ -13,8 +13,18 @@ router = APIRouter()
 async def get_topics(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     results = await db.execute(select(Topic).where(Topic.user_id == current_user.id).order_by(Topic.priority_score.desc()))
     topics = results.scalars().all()
-    
-    responses = [TopicResponse.model_validate(topic) for topic in topics]
+    responses = []
+
+    for topic in topics:
+        responses.append(TopicResponse(
+            id=topic.id,
+            name=topic.name,
+            priority_score=topic.priority_score,
+            status=topic.status,
+            last_reviewed_at=topic.last_reviewed_at,
+            created_at=topic.created_at
+        ))
+
     return responses
 
 
@@ -29,7 +39,14 @@ async def create_topic(new_topic: TopicCreate, current_user: User = Depends(get_
     await db.commit()
     await db.refresh(topic)
 
-    return TopicResponse.model_validate(topic)
+    return TopicResponse(
+        id=topic.id,
+        name=topic.name,
+        priority_score=topic.priority_score,
+        status=topic.status,
+        last_reviewed_at=topic.last_reviewed_at,
+        created_at=topic.created_at
+    )
 
 
 @router.put('/topics/{topic_id}')
@@ -49,7 +66,14 @@ async def update_topic(topic_id: UUID, update_data: TopicUpdate, current_user: U
     await db.commit()
     await db.refresh(topic)
 
-    return TopicResponse.model_validate(topic)
+    return TopicResponse(
+        id=topic.id,
+        name=topic.name,
+        priority_score=topic.priority_score,
+        status=topic.status,
+        last_reviewed_at=topic.last_reviewed_at,
+        created_at=topic.created_at
+    )
 
 
 @router.delete('/topics/{topic_id}')
