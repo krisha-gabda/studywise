@@ -74,8 +74,34 @@ class NotesUploadResponse(BaseModel):
     topics_extracted: list[str]
 
 # Flashcards
+class Flashcard(BaseModel):
+    question: str
+    answer: str
 
-# Explain It
+
+class FlashcardsResponse(BaseModel):
+    topic_id: UUID
+    topic_name: str
+    flashcards: list[Flashcard]
+
+
+# Quiz
+class QuizQuestion(BaseModel):
+    question: str
+    options: list[str]          # 4 options
+    correct_index: int          # index of correct option
+
+
+class QuizResponse(BaseModel):
+    topic_id: UUID
+    topic_name: str
+    questions: list[QuizQuestion]
+
+
+class QuizSubmission(BaseModel):
+    topic_id: UUID
+    answers: list[int]          # User's selected answers
+
 
 # Session Results (sent after any study mode)
 
