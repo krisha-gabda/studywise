@@ -104,6 +104,23 @@ class QuizSubmission(BaseModel):
 
 
 # Session Results (sent after any study mode)
+class SessionResultCreate(BaseModel):
+    topic_id: UUID
+    mode: str                   # flashcard / quiz
+    score: float
+    confidence: Optional[str]
+
+
+class SessionResultResponse(BaseModel):
+    id: UUID
+    topic_id: UUID
+    mode: str
+    score: float
+    confidence: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = None
 
 # Smart Session
 

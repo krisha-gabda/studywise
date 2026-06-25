@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     # Gemini
     GEMINI_API_KEY: str
-    GEMINI_LLM_MODEL: str = 'gemini-3.5-flash'
+    GEMINI_LLM_MODEL: str = 'gemini-2.5-flash'
     GEMINI_EMBEDDING_MODEL: str = 'gemini-embedding-001'
 
     # Database
@@ -38,6 +38,11 @@ class Settings(BaseSettings):
         'http://localhost:5173'         # VITE dev server
         # Add domain name after deployment
     ]
+
+    # Priority Score Constants
+    WEIGHT_FLASHCARD: float = 0.4
+    WEIGHT_QUIZ: float = 0.4
+    WEIGHT_TIME: float = 0.2
 
     class Config:
         env_file = '.env'
