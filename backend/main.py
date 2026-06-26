@@ -5,6 +5,8 @@ from config import get_settings
 from routers.auth import router as auth_router
 from routers.notes import router as notes_router
 from routers.roadmap import router as roadmap_router
+from routers.study import router as study_router
+from routers.session import router as session_router
 
 app = FastAPI(title='Studywise')
 
@@ -34,8 +36,8 @@ async def startup():
 app.include_router(auth_router, prefix='/api/auth', tags=['auth'])
 app.include_router(notes_router, prefix='/api/notes', tags=['notes'])
 app.include_router(roadmap_router, prefix='/api/roadmap', tags=['roadmap'])
-# app.include_router(study_router, prefix='/api/study', tags=['study'])
-# app.include_router(session_router, prefix='/api/session', tags=['session'])
+app.include_router(study_router, prefix='/api/study', tags=['study'])
+app.include_router(session_router, prefix='/api/session', tags=['session'])
 
 @app.get("/")
 async def root():

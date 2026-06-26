@@ -61,7 +61,7 @@ class TopicResponse(BaseModel):
     name: str
     priority_score: float
     status: TopicStatusEnum
-    last_reviewed_at: Optional[Enum] = None
+    last_reviewed_at: Optional[datetime] = None
     created_at: datetime
 
     class config:
@@ -74,10 +74,53 @@ class NotesUploadResponse(BaseModel):
     topics_extracted: list[str]
 
 # Flashcards
+class Flashcard(BaseModel):
+    question: str
+    answer: str
 
-# Explain It
+
+class FlashcardsResponse(BaseModel):
+    topic_id: UUID
+    topic_name: str
+    flashcards: list[Flashcard]
+
+
+# Quiz
+class QuizQuestion(BaseModel):
+    question: str
+    options: list[str]          # 4 options
+    correct_index: int          # index of correct option
+
+
+class QuizResponse(BaseModel):
+    topic_id: UUID
+    topic_name: str
+    questions: list[QuizQuestion]
+
+
+class QuizSubmission(BaseModel):
+    topic_id: UUID
+    answers: list[int]          # User's selected answers
+
 
 # Session Results (sent after any study mode)
+class SessionResultCreate(BaseModel):
+    topic_id: UUID
+    mode: str                   # flashcard / quiz
+    score: float
+    confidence: Optional[str]
+
+
+class SessionResultResponse(BaseModel):
+    id: UUID
+    topic_id: UUID
+    mode: str
+    score: float
+    confidence: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = None
 
 # Smart Session
 
