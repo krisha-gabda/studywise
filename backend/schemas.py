@@ -61,7 +61,7 @@ class TopicResponse(BaseModel):
     name: str
     priority_score: float
     status: TopicStatusEnum
-    last_reviewed_at: Optional[Enum] = None
+    last_reviewed_at: Optional[datetime] = None
     created_at: datetime
 
     class config:
