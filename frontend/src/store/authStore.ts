@@ -6,7 +6,7 @@ type AuthStore = {
     user: User,
     token: string,
     isLoading: boolean,
-    login: () => void,
+    login: (token: string, user: User) => void,
     logout: () => void,
     initialize: () => void
 };
@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthStore>()(persist((set) => ({
     token: '',
     isLoading: true,
 
-    login: () => {
+    login: (token: string, user: User) => {
         set((state) => ({ token: state.token}));
         set((state) => ({ user: state.user}));
     },
