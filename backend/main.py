@@ -7,6 +7,7 @@ from routers.notes import router as notes_router
 from routers.roadmap import router as roadmap_router
 from routers.study import router as study_router
 from routers.session import router as session_router
+from routers.projects import router as project_router
 
 app = FastAPI(title='Studywise')
 
@@ -38,6 +39,7 @@ app.include_router(notes_router, prefix='/api/notes', tags=['notes'])
 app.include_router(roadmap_router, prefix='/api/roadmap', tags=['roadmap'])
 app.include_router(study_router, prefix='/api/study', tags=['study'])
 app.include_router(session_router, prefix='/api/session', tags=['session'])
+app.include_router(project_router, prefix='/api/projects', tags=['projects'])
 
 @app.get("/")
 async def root():

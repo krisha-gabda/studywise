@@ -10,14 +10,15 @@ from uuid import UUID
 router = APIRouter()
 
 @router.get('/topics')
-async def get_topics(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    results = await db.execute(select(Topic).where(Topic.user_id == current_user.id).order_by(Topic.priority_score.desc()))
+async def get_topics(project_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    results = await db.execute(select(Topic).where(Topic.user_id == current_user.id, Topic.project_id == project_id).order_by(Topic.priority_score.desc()))
     topics = results.scalars().all()
     responses = []
 
     for topic in topics:
         responses.append(TopicResponse(
             id=topic.id,
+            project_id=topic.project_id,
             name=topic.name,
             priority_score=topic.priority_score,
             status=topic.status,
@@ -29,9 +30,10 @@ async def get_topics(current_user: User = Depends(get_current_user), db: AsyncSe
 
 
 @router.post('/topics')
-async def create_topic(new_topic: TopicCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def create_topic(new_topic: TopicCreate, project_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     topic = Topic(
         user_id = current_user.id,
+        project_id = project_id,
         name = new_topic.name
     )
 
@@ -41,6 +43,7 @@ async def create_topic(new_topic: TopicCreate, current_user: User = Depends(get_
 
     return TopicResponse(
         id=topic.id,
+        project_id = topic.project_id,
         name=topic.name,
         priority_score=topic.priority_score,
         status=topic.status,
@@ -50,8 +53,8 @@ async def create_topic(new_topic: TopicCreate, current_user: User = Depends(get_
 
 
 @router.put('/topics/{topic_id}')
-async def update_topic(topic_id: UUID, update_data: TopicUpdate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Topic).where(Topic.id == topic_id, Topic.user_id == current_user.id))
+async def update_topic(topic_id: UUID, project_id: UUID, update_data: TopicUpdate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Topic).where(Topic.id == topic_id, Topic.project_id == project_id, Topic.user_id == current_user.id))
     topic = result.scalar_one_or_none()
 
     if topic is None:
@@ -68,6 +71,7 @@ async def update_topic(topic_id: UUID, update_data: TopicUpdate, current_user: U
 
     return TopicResponse(
         id=topic.id,
+        project_id = topic.project_id,
         name=topic.name,
         priority_score=topic.priority_score,
         status=topic.status,
@@ -77,8 +81,8 @@ async def update_topic(topic_id: UUID, update_data: TopicUpdate, current_user: U
 
 
 @router.delete('/topics/{topic_id}')
-async def delete_topic(topic_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Topic).where(Topic.id == topic_id, Topic.user_id == current_user.id))
+async def delete_topic(topic_id: UUID, project_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Topic).where(Topic.id == topic_id, Topic.project_id == project_id, Topic.user_id == current_user.id))
     topic = result.scalar_one_or_none()
 
     if topic is None:

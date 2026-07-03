@@ -71,11 +71,13 @@ def run_test():
     print("=" * 50)
 
     test_user_id = "test-user-123"
+    test_project_id = "test-project-456"
     test_topic_name = "Neural Networks"
 
     try:
         store_chunks(
             user_id=test_user_id,
+            project_id=test_project_id,
             topic_name=test_topic_name,
             chunks=chunks,
             embeddings=all_vectors
@@ -94,6 +96,7 @@ def run_test():
     try:
         results = query_chunks(
             user_id=test_user_id,
+            project_id=test_project_id,
             query_text=query,
             top_k=3
         )
@@ -112,6 +115,7 @@ def run_test():
     try:
         other_user_results = query_chunks(
             user_id="some-other-user-999",
+            project_id=test_project_id,
             query_text=query,
             top_k=3
         )

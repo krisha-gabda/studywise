@@ -10,12 +10,13 @@ from services.embedder import embed_chunks
 from services.vector_store import store_chunks
 from models.topic import Topic
 from schemas import NotesUploadResponse
+from uuid import UUID
 
 settings = get_settings()
 router = APIRouter()
 
 @router.post('/upload')
-async def upload(file: UploadFile, current_user: User = Depends(get_current_user), db : AsyncSession = Depends(get_db)):
+async def upload(file: UploadFile, project_id: UUID, current_user: User = Depends(get_current_user), db : AsyncSession = Depends(get_db)):
     # Validate the upload
     if file.content_type not in settings.ALLOWED_UPLOAD_TYPES:
         raise HTTPException(status_code=400, detail='Upload type not supported')
@@ -42,11 +43,11 @@ async def upload(file: UploadFile, current_user: User = Depends(get_current_user
     embeddings = embed_chunks(chunks=chunks)
 
     # Store in ChromaDB
-    store_chunks(user_id=str(current_user.id), topic_name='random_topic', chunks=chunks, embeddings=embeddings) # Placeholder for topic_name. Change later
+    store_chunks(user_id=str(current_user.id), topic_name='random_topic', chunks=chunks, embeddings=embeddings, project_id=project_id) # Placeholder for topic_name. Change later
 
     # Save topics in database
     for topic in topics:
-        new_topic = Topic(user_id=current_user.id, name=topic)
+        new_topic = Topic(user_id=current_user.id, project_id=project_id, name=topic)
         db.add(new_topic)
         
     await db.commit()
