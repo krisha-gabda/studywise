@@ -1,4 +1,4 @@
-import type { TokenResponse, UserLogin, UserResponse } from "../types/user";
+import type { TokenResponse, UserLogin, UserRegister, UserResponse } from "../types/user";
 import { apiRequest } from "./client";
 
 export function login(credentials: UserLogin): Promise<TokenResponse> {
@@ -6,6 +6,14 @@ export function login(credentials: UserLogin): Promise<TokenResponse> {
         method: 'POST',
         body: credentials,
         auth: false // no token exists yet as user has not logged in
+    })
+}
+
+export function register(credentials: UserRegister): Promise<TokenResponse> {
+    return apiRequest<TokenResponse>('/api/auth/register', {
+        method: 'POST',
+        body: credentials,
+        auth: false
     })
 }
 

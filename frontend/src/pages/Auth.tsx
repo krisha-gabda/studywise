@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CiLock, CiUser } from "react-icons/ci";
-import { login } from "../api/auth";
+import { login, register } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { APIError } from "../api/client";
@@ -8,10 +8,17 @@ import { APIError } from "../api/client";
 export default function Auth() {
     
     const [ mode, setMode ] = useState<'login' | 'register'>('login');
-    const [ formData, setFormData ] = useState({
+    const [ loginFormData, setLoginFormData ] = useState({
         email: "",
         password: ""
     });
+
+    const [ registerFormData, setRegisterFormData ] = useState({
+        email: '',
+        password: '',
+        password_re: ''
+    })
+
     const [ error, setError ] = useState<String | null>(null);
     const [ isSubmitting, setIsSubmitting ] = useState(false);
 
@@ -20,10 +27,18 @@ export default function Auth() {
     const navigate = useNavigate();
 
     const handleChange = (e: any) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        })
+
+        if (mode === 'login') {
+            setLoginFormData({
+                ...loginFormData,
+                [e.target.name]: e.target.value
+            })
+        } else if (mode === 'register') {
+            setRegisterFormData({
+                ...registerFormData,
+                [e.target.name]: e.target.value
+            })
+        }
     }
 
     const handleSubmit = async(e: any) => {
@@ -32,9 +47,24 @@ export default function Auth() {
         setIsSubmitting(true);
 
         try {
-            const response = await login(formData);
-            storeLogin(response.access_token, response.user);
-            navigate('/');
+            if (mode === 'login') {
+                const response = await login(loginFormData);
+                storeLogin(response.access_token, response.user);
+                navigate('/');
+            } else if (mode === 'register') {
+                if (registerFormData.password === registerFormData.password_re) {
+
+                    const response = await register({
+                        email: registerFormData.email, 
+                        password: registerFormData.password
+                    });
+
+                    setMode('login');
+                } else {
+                    console.log("The passwords do not match.")
+                }
+
+            }
         } catch (err) {
             if (err instanceof APIError) {
                 setError(err.message);
@@ -80,7 +110,7 @@ export default function Auth() {
                         <CiUser className="absolute left-3 text-primary-text" />
                         <input 
                             onChange={handleChange}
-                            value={formData.email}
+                            value={loginFormData.email}
                             name='email'
                             className="w-full text-primary-text bg-elevated-bg p-2 pl-10 rounded-md" 
                             id='email' 
@@ -93,7 +123,7 @@ export default function Auth() {
                         <CiLock className="absolute left-3 text-primary-text" />
                         <input 
                             onChange={handleChange}
-                            value={formData.password}
+                            value={loginFormData.password}
                             name='password'
                             className="w-full text-primary-text bg-elevated-bg p-2 pl-10 rounded-md" 
                             id='password' 
@@ -110,10 +140,13 @@ export default function Auth() {
             {mode === 'register' &&(
             <div className="bg-card-bg p-20 rounded-3xl h-1/3 flex items-center justify-center" id='register'>
 
-                <form>
+                <form onSubmit={handleSubmit}>
                     <div className="relative flex items-center pb-3">
                         <CiUser className="absolute left-3 text-primary-text" />
                         <input 
+                            onChange={handleChange}
+                            value={registerFormData.email}
+                            name='email'
                             className="w-full text-primary-text bg-elevated-bg p-2 pl-10 rounded-md" 
                             id='email' 
                             placeholder='Enter Email...' 
@@ -124,6 +157,9 @@ export default function Auth() {
                     <div className="relative flex items-center pb-3">
                         <CiLock className="absolute left-3 text-primary-text" />
                         <input 
+                            onChange={handleChange}
+                            value={registerFormData.password}
+                            name='password'
                             className="w-full text-primary-text bg-elevated-bg p-2 pl-10 rounded-md" 
                             id='password' 
                             placeholder='Enter Password...' 
@@ -133,9 +169,12 @@ export default function Auth() {
 
                     <div className="relative flex items-center pb-3">
                         <CiLock className="absolute left-3 text-primary-text" />
-                        <input 
+                        <input
+                            onChange={handleChange}
+                            value={registerFormData.password_re}
+                            name='password_re'
                             className="w-full text-primary-text bg-elevated-bg p-2 pl-10 rounded-md" 
-                            id='password' 
+                            id='password2'
                             placeholder='ReEnter Password...' 
                             type='password' 
                         />
