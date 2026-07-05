@@ -4,6 +4,9 @@ import { login, register } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { APIError } from "../api/client";
+import { getProjects } from "../api/projects";
+import { useProjectStore } from "../store/pojectStore";
+import { getTopics } from "../api/roadmap";
 
 export default function Auth() {
     
@@ -22,7 +25,11 @@ export default function Auth() {
     const [ error, setError ] = useState<String | null>(null);
     const [ isSubmitting, setIsSubmitting ] = useState(false);
 
-    const storeLogin = useAuthStore((state) => state.login)
+    const storeLogin = useAuthStore((state) => state.login);
+    const storeProject = useProjectStore((state) => state.setProjects);
+
+    const projectIds: string[] = [];
+    const projectNames: string[] = [];
 
     const navigate = useNavigate();
 
@@ -50,7 +57,7 @@ export default function Auth() {
             if (mode === 'login') {
                 const response = await login(loginFormData);
                 storeLogin(response.access_token, response.user);
-                navigate('/');
+                navigate('/projects');
             } else if (mode === 'register') {
                 if (registerFormData.password === registerFormData.password_re) {
 
@@ -58,8 +65,10 @@ export default function Auth() {
                         email: registerFormData.email, 
                         password: registerFormData.password
                     });
-
-                    setMode('login');
+                    
+                    if (response) {
+                       setMode('login');
+                    }
                 } else {
                     console.log("The passwords do not match.")
                 }
@@ -75,6 +84,9 @@ export default function Auth() {
             setIsSubmitting(false);
         }
     }
+
+    if (error) return <p>An Error occured. Please try again.</p>
+    if (isSubmitting) return <p>Loading...</p>
 
     return(
         <div className="bg-page-bg h-screen text-center flex flex-col justify-center items-center">

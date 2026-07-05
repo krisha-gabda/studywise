@@ -49,6 +49,7 @@ class TopicStatusEnum(str, Enum):
 
 class TopicCreate(BaseModel):
     name: str
+    project_id: UUID
 
 
 class TopicUpdate(BaseModel):
@@ -61,6 +62,7 @@ class TopicResponse(BaseModel):
     name: str
     priority_score: float
     status: TopicStatusEnum
+    project_id: UUID
     last_reviewed_at: Optional[datetime] = None
     created_at: datetime
 
@@ -121,6 +123,17 @@ class SessionResultResponse(BaseModel):
 
     class Config:
         from_attributes = None
+
+
+# Projects
+class ProjectCreate(BaseModel):
+    name: str
+
+
+class ProjectResponse(BaseModel):
+    id: UUID
+    name: str
+    created_at: datetime
 
 # Smart Session
 

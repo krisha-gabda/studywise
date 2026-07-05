@@ -21,8 +21,7 @@ export const useAuthStore = create<AuthStore>()(persist((set) => ({
     isLoading: true,
 
     login: (token: string, user: User) => {
-        set((state) => ({ token: state.token}));
-        set((state) => ({ user: state.user}));
+        set({ token, user });
     },
 
     logout: () => {

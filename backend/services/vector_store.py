@@ -11,12 +11,17 @@ def get_collection():
     return collection
 
 
-def store_chunks(user_id: str, topic_name: str, chunks: list[str], embeddings: list[float]):
+def store_chunks(user_id: str, project_id: str, topic_name: str, chunks: list[str], embeddings: list[list[float]]):
     collection = get_collection()
 
-    ids = [f'{user_id}_{topic_name}_{i}_{uuid.uuid4()}' for i in range(len(chunks))]
+    user_id = str(user_id)
+    project_id = str(project_id)
+    topic_name = str(topic_name)
+
+    ids = [f'{user_id}_{project_id}_{topic_name}_{i}_{uuid.uuid4()}' for i in range(len(chunks))]
     metadatas = [{
         'user_id': user_id,
+        'project_id': project_id,
         'topic_name': topic_name
     } for _ in chunks]
 
@@ -28,14 +33,22 @@ def store_chunks(user_id: str, topic_name: str, chunks: list[str], embeddings: l
     )
 
 
-def query_chunks(user_id: str, query_text: str, top_k: int):
+def query_chunks(user_id: str, project_id: str, query_text: str, top_k: int):
     embeddings = embed_text(text=query_text, task_type='RETRIEVAL_QUERY')
     collection = get_collection()
+
+    user_id = str(user_id)
+    project_id = str(project_id)
 
     results = collection.query(
         query_embeddings=embeddings,
         n_results=top_k,
-        where={'user_id': user_id}
+        where={
+            '$and': [
+                {'user_id': user_id},
+                {'project_id': project_id}
+            ]
+        }
     )
 
     return results['documents'][0]
