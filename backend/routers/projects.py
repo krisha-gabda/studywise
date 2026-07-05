@@ -13,7 +13,7 @@ settings = get_settings()
 router = APIRouter()
 
 @router.get('/projects')
-async def projects(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_projects(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     results = await db.execute(select(Project).where(Project.user_id == current_user.id))
     projects = results.scalars().all()
     responses = []
