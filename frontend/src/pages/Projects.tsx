@@ -42,9 +42,19 @@ export default function Projects() {
             <h2 className="text-primary-text text-4xl font-bold">Welcome Back</h2>
             <p>Select a project to start learning.</p>
 
-            {/* Create a for loop and display the required project details followed by a project create button and then a project create component. Look into how to create a component like a pop up box or something */}
-
             <div className="flex flex-row gap-2 justify-center items-center">
+
+                <div className="bg-elevated-bg w-72 rounded-md h-48 p-5 flex flex-col items-center justify-center text-center">
+                    <h3 className="text-primary-text text-2xl font-bold">Create New Project</h3>
+                    <button 
+                        className="bg-primary text-primary-text font-bold text-3xl p-4 py-3 mt-3 rounded-full hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                        type='button'
+                        onClick={() => navigate('/projects/new')}
+                    >
+                        +
+                    </button>
+                </div>
+
                 {projects.map((project) => (
                     <div className="bg-card-bg w-72 rounded-md h-48 p-5 flex flex-col items-center justify-center text-center">
                         <h3 className="text-primary-text text-2xl font-bold" key={project.id}>{project.name}</h3>
