@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { APIError } from "../api/client";
 import { getTopics } from "../api/roadmap";
 import { useTopicsStore } from "../store/topicsStore";
+import { uploadNotes } from "../api/notes";
 
 export default function NewProject() {
 
-    const [ files, setFiles ] = useState<File[]>([]);
+    const [ file, setFile ] = useState<File | null>(null);
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState<null | string>(null);
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function NewProject() {
 
     const handleFileChange = (e: any) => {
         if (e.target.files) {
-            setFiles(Array.from(e.target.files));
+            setFile(e.target.files[0]);
         }
     }
 
@@ -35,15 +36,21 @@ export default function NewProject() {
 
     const handleSubmit = async(e: any) => {
         e.preventDefault();
+        setError(null);
         setLoading(true);
 
         try {
             const response = await createProject(projectCreate);
             storeCurrentProject(response);
 
-            const topicResponse = await getTopics(response.id);
-            storeTopics(topicResponse);
-
+            if (file != null) {
+                await uploadNotes(file, response.id);
+                const topics = await getTopics(response.id);
+                storeTopics(topics);
+            } else {
+                setError('Please upload file to continue.')
+            }
+            
             navigate(`/dashboard/${response.id}`);
         } catch (err) {
             if (err instanceof APIError) {
@@ -63,12 +70,14 @@ export default function NewProject() {
         <div className="bg-page-bg h-screen flex flex-col justify-center items-center">
             <h3 className="text-primary-text font-bold text-5xl">Create a new Project</h3>
             <div className="bg-card-bg py-12 h-min-120 w-96 mt-8 rounded-4xl flex justify-center items-center ">
-                <form>
+                <form onSubmit={handleSubmit}>
                     <label className="text-primary-text font-bold text-xl mb-2">Project Name:</label>
                     <input 
                         required 
+                        value={projectCreate.name}
+                        name="name"
                         className="bg-elevated-bg w-full text-secondary-text border-borders-bg rounded-md block mb-12"
-                        onChange={() => handleNameChange} 
+                        onChange={handleNameChange} 
                     />
 
                     <div className="">
@@ -80,20 +89,19 @@ export default function NewProject() {
                             onChange={handleFileChange} 
                             className="bg-elevated-bg w-full text-secondary-text border-borders-bg rounded-md block"
                         />
-                        {files.length > 0 && (
+                        {file && (
                             <div>
-                                <p className="text-primary-text text-2xs mt-12 font-bold">Selected files:</p>
+                                <p className="text-primary-text text-2xs mt-12 font-bold">File Details:</p>
                                 <ul>
-                                    {files.map((file, index) => (
-                                        <li className="text-primary-text pl-4" key={index}>{file.name}</li>
-                                    ))}
+                                    <li className="text-primary-text pl-4">Name: {file.name}</li>
+                                    <li className="text-primary-text pl-4">Type: {file.type}</li>
+                                    <li className="text-primary-text pl-4">Size: {(file.size / 1024).toFixed(2)} KB</li>
                                 </ul>
                             </div>
                         )}
 
                         <button 
                             className="w-full bg-primary mt-12 py-2 rounded-md cursor-pointer hover:bg-primary-hover transition-all ease-in"
-                            onSubmit={handleSubmit}
                         >
                             Submit
                         </button>
