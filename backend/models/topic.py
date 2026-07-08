@@ -18,7 +18,7 @@ class Topic(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
     name = Column(String, nullable=False)
-    priority_score=Column(Float, default=0.0)
+    priority_score = Column(Float, default=0.5)
     status = Column(Enum(TopicStatus), default=TopicStatus.not_started)
     last_reviewed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
