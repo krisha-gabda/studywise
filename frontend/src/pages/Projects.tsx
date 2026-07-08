@@ -3,6 +3,8 @@ import { useProjectStore } from "../store/pojectStore"
 import { getProjects } from "../api/projects";
 import { APIError } from "../api/client";
 import { useNavigate } from "react-router-dom";
+import { getTopics } from "../api/roadmap";
+import { useTopicsStore } from "../store/topicsStore";
 
 export default function Projects() {
 
@@ -12,6 +14,24 @@ export default function Projects() {
     const storeProject = useProjectStore((state) => state.setProjects);
     const projects = useProjectStore((state) => state.projects);
     const navigate = useNavigate();
+    const storeTopics = useTopicsStore((state) => (state.setTopics));
+
+    const selectProject = async(project_id: string) => {
+        setLoading(true);
+        try {
+            const repsonse = await getTopics(project_id);
+            storeTopics(repsonse);
+            navigate(`/roadmap/${project_id}`)
+        } catch (err) {
+            if (err instanceof APIError) {
+                setError(err.message);
+            } else {
+                setError('Something went wrong. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         try {
@@ -62,7 +82,7 @@ export default function Projects() {
                         <button 
                             className="bg-primary text-primary-text px-3 p-2 mt-4 rounded-2xl font-semiboldbold hover:bg-primary-hover transition-all ease-in cursor-pointer" 
                             type="button" 
-                            onClick={() => navigate(`/dashboard/${project.id}`)}
+                            onClick={() => selectProject(project.id)}
                         >
                             View Project
                         </button>

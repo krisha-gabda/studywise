@@ -51,7 +51,7 @@ export default function NewProject() {
                 setError('Please upload file to continue.')
             }
             
-            navigate(`/dashboard/${response.id}`);
+            navigate(`/roadmap/${response.id}`);
         } catch (err) {
             if (err instanceof APIError) {
                 setError(err.message);
