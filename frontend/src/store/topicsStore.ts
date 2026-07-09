@@ -5,7 +5,8 @@ import { persist } from "zustand/middleware"
 type TopicsStore = {
     topics: Topic[],
     currentTopic: Topic,
-    setTopics: (topics: Topic[]) => void
+    setTopics: (topics: Topic[]) => void,
+    setCurrentTopic: (currentTopic: Topic) => void
 }
 
 export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
@@ -22,7 +23,12 @@ export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
 
     setTopics(topics: Topic[]) {
         set({ topics })
-    }
+    },
+
+    setCurrentTopic(currentTopic: Topic) {
+        set({ currentTopic })
+    },
+
 }), {
     name: 'topic-storage',
     partialize: (state) => ({

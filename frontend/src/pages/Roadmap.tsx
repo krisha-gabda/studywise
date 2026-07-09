@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { useTopicsStore } from "../store/topicsStore"
+import type { Topic } from "../types/topic";
 
 export default function Roadmap() {
     const topics = useTopicsStore((state) => (state.topics));
+    const storeCurrentTopic = useTopicsStore((state) => (state.setCurrentTopic));
+    const navigate = useNavigate();
 
     const backgroundColors = {
         needs_work: 'bg-danger',
@@ -9,6 +13,11 @@ export default function Roadmap() {
         mastered: 'bg-secondary',
         default: 'bg-primary'
     };
+
+    const selectTopic = (topic: Topic) => {
+        storeCurrentTopic(topic);
+        navigate(`/projects/${topic.project_id}/study/${topic.id}`);
+    }
 
     return(
         <div className="bg-page-bg  min-h-screen flex flex-col justify-center items-center">
@@ -25,7 +34,7 @@ export default function Roadmap() {
                                 <p className="text-secondary-text">Last Reviewed At: {topic.last_reviewed_at}</p>
                             )}
                         </div>
-                        <button type="button" className={`ml-auto ${backgroundColors[topic.status as keyof typeof backgroundColors]} text-primary-text px-4 rounded-2xl h-16 mr-2 font-bold`}>Start Learning</button>
+                        <button type="button" onClick={() => selectTopic(topic)} className={`ml-auto ${backgroundColors[topic.status as keyof typeof backgroundColors]} text-primary-text px-4 rounded-2xl h-16 mr-2 font-bold`}>Start Learning</button>
                     </div>
                 ))}
             </div>

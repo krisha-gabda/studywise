@@ -4,6 +4,7 @@ import Auth from "./pages/Auth"
 import Projects from "./pages/Projects"
 import NewProject from "./pages/newProject"
 import Roadmap from "./pages/Roadmap"
+import Study from "./pages/Study"
 
 export default function App() {
   return(
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path='/projects/new' element={<NewProject />} />
         <Route path='/roadmap/:projectid' element={<Roadmap />} />
+        <Route path="/projects/:projectid/study/:topicid" element={<Study />} />
       </Routes>
     </Router>
   )
