@@ -1,7 +1,7 @@
-import type { SummaryResponse } from "../types/study";
+import type { FlashcardsResponse, SummaryResponse } from "../types/study";
 import { apiRequest } from "./client";
 
-export default function getSummary(topicId: string, projectId: string): Promise<SummaryResponse> {
+export function getSummary(topicId: string, projectId: string): Promise<SummaryResponse> {
     const params = new URLSearchParams({
         topic_id: topicId,
         project_id: projectId
@@ -9,5 +9,15 @@ export default function getSummary(topicId: string, projectId: string): Promise<
 
     return apiRequest<SummaryResponse>(`/api/study/summary?${params.toString()}`, {
         method: 'POST'
+    })
+}
+
+export function getFlashcards(topicId: string, projectId: string): Promise<FlashcardsResponse> {
+    return apiRequest<FlashcardsResponse>('/api/study/flashcards', {
+        method: "POST",
+        body: {
+            topic_id: topicId,
+            project_id: projectId
+        }
     })
 }

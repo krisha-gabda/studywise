@@ -1,12 +1,15 @@
 import { create } from "zustand"
 import type { Topic } from "../types/topic"
 import { persist } from "zustand/middleware"
+import type { SummaryResponse } from "../types/study"
 
 type TopicsStore = {
     topics: Topic[],
     currentTopic: Topic,
+    summary: SummaryResponse,
     setTopics: (topics: Topic[]) => void,
-    setCurrentTopic: (currentTopic: Topic) => void
+    setCurrentTopic: (currentTopic: Topic) => void,
+    setSummary: (summary: SummaryResponse) => void
 }
 
 export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
@@ -20,6 +23,10 @@ export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
         last_reviewed_at: '',
         created_at: ''
     },
+    summary: {
+        headline: '',
+        summary: ''
+    },
 
     setTopics(topics: Topic[]) {
         set({ topics })
@@ -27,6 +34,10 @@ export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
 
     setCurrentTopic(currentTopic: Topic) {
         set({ currentTopic })
+    },
+
+    setSummary(summary) {
+        set({ summary })
     },
 
 }), {

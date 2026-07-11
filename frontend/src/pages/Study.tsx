@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTopicsStore } from "../store/topicsStore"
-import getSummary from "../api/study";
+import { getSummary } from "../api/study";
 import { APIError } from "../api/client";
+import { useNavigate } from "react-router-dom";
 
 export default function Study() {
     const topic = useTopicsStore((state) => (state.currentTopic));
@@ -9,6 +10,8 @@ export default function Study() {
         headline: '',
         summary: ''
     });
+
+    const navigate = useNavigate();
 
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState<null | string>(null)
@@ -59,13 +62,25 @@ export default function Study() {
                     <p className="text-2xl text-primary-text font-bold pb-12">Flashcards</p>
                     <p className="text-secondary-text">Strengthen your understanding by reviewing flashcards</p>
                     <p className="text-secondary-text">Revise like a pro</p>
-                    <button className="bg-primary p-4 rounded-lg mt-8 text-primary-text font-bold hover:bg-primary-hover transition-all ease-in cursor-pointer">Start Revising</button>
+                    <button
+                        type="button"
+                        className="bg-primary p-4 rounded-lg mt-8 text-primary-text font-bold hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                        onClick={() => navigate(`/projects/${topic.project_id}/study/${topic.id}/flashcards`)}
+                    >
+                        Start Revising
+                    </button>
                 </div>
                 <div className="bg-card-bg w-full p-12  border-t-primary border-t-4">
                     <p className="text-2xl text-primary-text font-bold pb-12">Take Quiz</p>
                     <p className="text-secondary-text">Test yourself to check your understanding</p>
                     <p className="text-secondary-text">Test your understanding</p>
-                    <button className="bg-primary p-4 rounded-lg mt-8 text-primary-text font-bold hover:bg-primary-hover transition-all ease-in cursor-pointer">Start Quiz</button>
+                    <button 
+                        type="button" 
+                        className="bg-primary p-4 rounded-lg mt-8 text-primary-text font-bold hover:bg-primary-hover transition-all ease-in cursor-pointer" 
+                        onClick={() => navigate(`/projects/${topic.project_id}/study/${topic.id}/quiz`)}
+                    >
+                        Start Quiz
+                    </button>
                 </div>
             </div>
         </div>
