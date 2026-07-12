@@ -47,7 +47,7 @@ async def upload(file: UploadFile, project_id: UUID, current_user: User = Depend
 
     # Save topics in database
     for topic in topics:
-        new_topic = Topic(user_id=current_user.id, project_id=project_id, name=topic)
+        new_topic = Topic(user_id=current_user.id, project_id=project_id, name=topic.name, headline=topic.headline, summary=topic.summary)
         db.add(new_topic)
         
     await db.commit()

@@ -20,5 +20,7 @@ class Topic(Base):
     name = Column(String, nullable=False)
     priority_score = Column(Float, default=0.5)
     status = Column(Enum(TopicStatus), default=TopicStatus.not_started)
+    headline = Column(String, nullable=True)
+    summary = Column(String, nullable=True)
     last_reviewed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

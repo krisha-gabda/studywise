@@ -2,11 +2,12 @@ from prompts.extract_topics import build_extract_topics_prompt
 from google import genai
 from config import get_settings
 import json
+from schemas import TopicInfo
 
 settings = get_settings()
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-def extract_topics(notes_text: str) -> list[str]:
+def extract_topics(notes_text: str) -> list[TopicInfo]:
 
     if not notes_text.strip():
         raise ValueError('Cannot pass an empty string for notes.')
@@ -23,8 +24,24 @@ def extract_topics(notes_text: str) -> list[str]:
     text_response = text_response.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
 
     try:
-        parsed_string = json.loads(text_response)
+        parsed_topics = json.loads(text_response)
     except json.JSONDecodeError:
         raise ValueError(f"Gemini returned invalid JSON: {text_response[:200]}")
-    
-    return parsed_string
+
+    if not isinstance(parsed_topics, list):
+        raise ValueError(f"Gemini returned invalid topic data: {text_response[:200]}")
+
+    topics: list[TopicInfo] = []
+    for item in parsed_topics:
+        if not isinstance(item, dict):
+            raise ValueError(f"Gemini returned an invalid topic entry: {item}")
+
+        topics.append(
+            TopicInfo(
+                name=item['name'],
+                headline=item['headline'],
+                summary=item['summary'],
+            )
+        )
+
+    return topics

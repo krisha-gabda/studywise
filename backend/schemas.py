@@ -63,6 +63,8 @@ class TopicResponse(BaseModel):
     priority_score: float
     status: TopicStatusEnum
     project_id: UUID
+    headline: str
+    summary: str
     last_reviewed_at: Optional[datetime] = None
     created_at: datetime
 
@@ -70,10 +72,16 @@ class TopicResponse(BaseModel):
         from_attributes = True
 
 
+class TopicInfo(BaseModel):
+    name: str
+    headline: str
+    summary: str
+
+
 # Notes Upload
 class NotesUploadResponse(BaseModel):
     message: str
-    topics_extracted: list[str]
+    topics_extracted: list[TopicInfo]
 
 # Flashcards
 class Flashcard(BaseModel):
