@@ -6,8 +6,16 @@ export interface Topic {
     name: string
     priority_score: number
     status: string
+    headline: string
+    summary: string
     last_reviewed_at: string | null
     created_at: string
+}
+
+export interface TopicInfo {
+    name: string
+    headline: string
+    summary: string
 }
 
 export interface TopicCreate {

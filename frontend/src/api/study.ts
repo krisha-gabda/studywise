@@ -13,11 +13,12 @@ export function getSummary(topicId: string, projectId: string): Promise<SummaryR
 }
 
 export function getFlashcards(topicId: string, projectId: string): Promise<FlashcardsResponse> {
-    return apiRequest<FlashcardsResponse>('/api/study/flashcards', {
-        method: "POST",
-        body: {
-            topic_id: topicId,
-            project_id: projectId
-        }
+const params = new URLSearchParams({
+    topic_id: topicId,
+    project_id: projectId
+})
+
+    return apiRequest<FlashcardsResponse>(`/api/study/flashcards?${params.toString()}`, {
+        method: "POST"
     })
 }
