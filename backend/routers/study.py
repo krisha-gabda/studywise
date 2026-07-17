@@ -40,7 +40,10 @@ async def quiz(topic_id: UUID, project_id: UUID, current_user: User = Depends(ge
     if topic is None:
         raise HTTPException(status_code=404, detail='Not found or not owned')
     
-    quiz = generate_quiz(user_id=current_user.id, project_id=project_id, topic_name=topic.name)
+    try:
+        quiz = generate_quiz(user_id=current_user.id, project_id=project_id, topic_name=topic.name)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f'Quiz generation failed, please try again: {e}')
 
     return QuizResponse(
         topic_id = topic_id,
