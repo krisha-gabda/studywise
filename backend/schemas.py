@@ -124,7 +124,7 @@ class SessionResultCreate(BaseModel):
     topic_id: UUID
     mode: str                   # flashcard / quiz
     score: float
-    confidence: Optional[str]
+    confidence: Optional[str] = None
 
 
 class SessionResultResponse(BaseModel):

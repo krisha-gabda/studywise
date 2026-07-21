@@ -21,23 +21,30 @@ export default function Flashcards() {
     const [ error, setError ] = useState<null | string>(null);
 
     useEffect(() => {
-        setLoading(true);
-        try {
-            async function flashcardsAPICall() {
+        async function flashcardsAPICall() {
+            setLoading(true);
+            setError(null);
+            setCurrectIndex(0);
+            setIsFlipped(false);
+            setSubmit(false);
+            setSubmitted(false);
+
+            try {
                 const result = await getFlashcards(topic.id, topic.project_id);
                 setFlashcards(result);
+            } catch (err) {
+                if (err instanceof APIError) {
+                    setError(err.message);
+                } else {
+                    setError('Something went wrong... Please try again...');
+                }
+            } finally {
+                setLoading(false);
             }
-            flashcardsAPICall();
-        } catch (err) {
-            if (err instanceof APIError) {
-                setError(err.message);
-            } else {
-                setError('Something went wrong... Please try again...');
-            }
-        } finally {
-            setLoading(false);
         }
-    }, []);
+
+        flashcardsAPICall();
+    }, [topic.id, topic.project_id, setFlashcards]);
 
     const handleLeftArrow = () => {
         if (currectIndex !== 0) {

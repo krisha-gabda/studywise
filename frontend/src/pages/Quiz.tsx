@@ -3,6 +3,7 @@ import { getQuiz } from "../api/study";
 import { useTopicsStore } from "../store/topicsStore";
 import { APIError } from "../api/client";
 import { useStudyStore } from "../store/studyStore";
+import { sessionResult } from "../api/session";
 
 export default function Quiz() {
     const topic = useTopicsStore((state) => state.currentTopic);
@@ -17,6 +18,8 @@ export default function Quiz() {
         const savedAnswers = localStorage.getItem(answersKey);
         return savedAnswers ? JSON.parse(savedAnswers) : {};
     });
+    const [ finished, setFinished ] = useState(false);
+    const [ submitted, setSubmitted ] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<null | string>(null);
@@ -29,6 +32,10 @@ export default function Quiz() {
         async function quizAPICall() {
             setLoading(true);
             setError(null);
+            setCurrentIndex(0);
+            setFinished(false);
+            setSubmitted(false);
+            setAnswers({});
 
             try {
                 const result = await getQuiz(topic.id, topic.project_id);
@@ -44,8 +51,8 @@ export default function Quiz() {
             }
         }
 
-        if (quiz[0].question === '') quizAPICall();
-    }, []);
+        quizAPICall();
+    }, [topic.id, topic.project_id, setQuiz]);
 
     function handleAnswer(questionIndex: number, optionIndex: number) {
         // Ignore if the user has already selected an answer
@@ -58,6 +65,7 @@ export default function Quiz() {
 
     function handleNext() {
         setCurrentIndex((index) => Math.min(index + 1, quiz.length - 1));
+        if (currentIndex === quiz.length - 1) setFinished(true);
     }
 
     function getOptionStyle(optionIndex: number) {
@@ -71,8 +79,36 @@ export default function Quiz() {
             : "bg-elevated-bg border-danger";
     }
 
+    async function handleSubmit() {
+        setLoading(true);
+        try {
+            const correctCount = quiz.reduce(
+                (total, question, index) => total + (answers[index] === question.correct_index ? 1 : 0), 0
+            );
+
+            const sessionResults = {
+                topic_id: topic.id,
+                mode: 'quiz',
+                score: correctCount / quiz.length,
+            }
+            const result = await sessionResult(sessionResults);
+            
+            if (result) setSubmitted(true);
+        } catch (err) {
+            if (err instanceof APIError) {
+                setError(err.message);
+            } else {
+                setError('Something went wrong... Please try again...');
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
+
     if (error) return <p>{error}</p>
     if (loading || quiz.length === 0) return <p>Loading...</p>
+
+    if (submitted) return <p>Quiz submitted successfully</p>
 
     return (
         <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">
@@ -90,7 +126,27 @@ export default function Quiz() {
                     </p>
                 </div>
             ))}
-            <button type="button" onClick={handleNext} className="bg-primary px-8 py-4 font-bold text-primary-text rounded-md ml-auto mr-[10vw] hover:bg-primary-hover transition-all ease-in cursor-pointer">Next</button>
+            
+            {!finished && (
+                <button 
+                    type="button" 
+                    onClick={handleNext} 
+                    className="bg-primary px-8 py-4 font-bold text-primary-text rounded-md ml-auto mr-[10vw] hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                >
+                    Next
+                </button>
+            )}
+
+            {finished && (
+                <button 
+                    type="button" 
+                    className="bg-primary px-8 py-4 font-bold text-primary-text rounded-md ml-auto mr-[10vw] hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                    onClick={handleSubmit}
+                >
+                    Finish
+                </button>
+            )}
+
         </div>
     )
 }
