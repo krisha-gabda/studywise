@@ -5,6 +5,7 @@ import { APIError } from "../api/client";
 import { useNavigate } from "react-router-dom";
 import { getTopics } from "../api/roadmap";
 import { useTopicsStore } from "../store/topicsStore";
+import Loading from "../components/Loading";
 
 export default function Projects() {
 
@@ -54,7 +55,7 @@ export default function Projects() {
         }
     }, [])
 
-    if (loading) return <p>Loading...</p>
+    if (loading) return <Loading />
     if (error) return <p>An error occured. Please try again.</p>
 
     return(

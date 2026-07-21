@@ -5,11 +5,14 @@ import { useTopicsStore } from "../store/topicsStore";
 import { APIError } from "../api/client";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { sessionResult } from "../api/session";
+import { getTopics } from "../api/roadmap";
+import Loading from "../components/Loading";
 
 export default function Flashcards() {
     const setFlashcards = useStudyStore((state) => state.setFlashcards);
     const topic = useTopicsStore((state) => state.currentTopic);
     const flashcards = useStudyStore((state) => state.flashcards.flashcards);
+    const setTopics = useTopicsStore((state) => state.setTopics);
 
     const [ isFlipped, setIsFlipped ] = useState(false);
     const [ currectIndex, setCurrectIndex ] = useState(0);
@@ -65,35 +68,36 @@ export default function Flashcards() {
         }
     }
 
-    const submitResult = (confidence: string) => {
+    const submitResult = async (confidence: string) => {
         setLoading(true);
+        setError(null);
+
         try {
-            async function sessionResultsAPI() {
-                const sessionResults = {
-                    topic_id: topic.id,
-                    mode: 'flashcard',
-                    score: 0,
-                    confidence: confidence,
-                };
+            const sessionResults = {
+                topic_id: topic.id,
+                mode: 'flashcard',
+                score: 0,
+                confidence: confidence,
+            };
 
-                const result = await sessionResult(sessionResults)
-                if (result) setSubmitted(true);
-            }
-            sessionResultsAPI();
+            await sessionResult(sessionResults);
 
+            const refreshedTopics = await getTopics(topic.project_id);
+            setTopics(refreshedTopics);
+
+            setSubmitted(true);
         } catch (err) {
             if (err instanceof APIError) {
                 setError(err.message);
             } else {
                 setError('Something went wrong... Please try again...');
             }
-
         } finally {
             setLoading(false);
         }
     }
 
-    if (loading || useStudyStore((state) => state.flashcards.flashcards.length === 0)) return <p>Loading...</p>
+    if (loading || flashcards.length === 0) return <Loading />
     if (error) return <p>{error}</p>
     if (submitted) return <p>Flashcards completed successfully</p>
 

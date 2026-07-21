@@ -6,6 +6,7 @@ import { APIError } from "../api/client";
 import { getTopics } from "../api/roadmap";
 import { useTopicsStore } from "../store/topicsStore";
 import { uploadNotes } from "../api/notes";
+import Loading from "../components/Loading";
 
 export default function NewProject() {
 
@@ -63,7 +64,7 @@ export default function NewProject() {
         }
     }
 
-    if (loading) return <p>Loading...</p>
+    if (loading) return <Loading />
     if (error) return <p>An error occured... Please try again...</p>
 
     return(

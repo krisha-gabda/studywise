@@ -4,11 +4,14 @@ import { useTopicsStore } from "../store/topicsStore";
 import { APIError } from "../api/client";
 import { useStudyStore } from "../store/studyStore";
 import { sessionResult } from "../api/session";
+import { getTopics } from "../api/roadmap";
+import Loading from "../components/Loading";
 
 export default function Quiz() {
     const topic = useTopicsStore((state) => state.currentTopic);
     const setQuiz = useStudyStore((state) => state.setQuiz);
     const quiz = useStudyStore((state) => state.quiz.questions);
+    const setTopics = useTopicsStore((state) => state.setTopics);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const currentQuestion = quiz[currentIndex];
@@ -91,9 +94,11 @@ export default function Quiz() {
                 mode: 'quiz',
                 score: correctCount / quiz.length,
             }
-            const result = await sessionResult(sessionResults);
-            
-            if (result) setSubmitted(true);
+            await sessionResult(sessionResults);
+            const refreshedTopics = await getTopics(topic.project_id);
+            setTopics(refreshedTopics);
+
+            setSubmitted(true);
         } catch (err) {
             if (err instanceof APIError) {
                 setError(err.message);
@@ -106,7 +111,7 @@ export default function Quiz() {
     }
 
     if (error) return <p>{error}</p>
-    if (loading || quiz.length === 0) return <p>Loading...</p>
+    if (loading || quiz.length === 0) return <Loading />
 
     if (submitted) return <p>Quiz submitted successfully</p>
 
