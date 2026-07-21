@@ -4,6 +4,7 @@ import { getFlashcards } from "../api/study";
 import { useTopicsStore } from "../store/topicsStore";
 import { APIError } from "../api/client";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { sessionResult } from "../api/session";
 
 export default function Flashcards() {
     const setFlashcards = useStudyStore((state) => state.setFlashcards);
@@ -14,6 +15,7 @@ export default function Flashcards() {
     const [ currectIndex, setCurrectIndex ] = useState(0);
     const currentCard = flashcards[currectIndex];
     const [ submit, setSubmit ] = useState(false);
+    const [ submitted, setSubmitted ] = useState(false);
 
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState<null | string>(null);
@@ -56,8 +58,37 @@ export default function Flashcards() {
         }
     }
 
+    const submitResult = (confidence: string) => {
+        setLoading(true);
+        try {
+            async function sessionResultsAPI() {
+                const sessionResults = {
+                    topic_id: topic.id,
+                    mode: 'flashcard',
+                    score: 0,
+                    confidence: confidence,
+                };
+
+                const result = await sessionResult(sessionResults)
+                if (result) setSubmitted(true);
+            }
+            sessionResultsAPI();
+
+        } catch (err) {
+            if (err instanceof APIError) {
+                setError(err.message);
+            } else {
+                setError('Something went wrong... Please try again...');
+            }
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
     if (loading || useStudyStore((state) => state.flashcards.flashcards.length === 0)) return <p>Loading...</p>
     if (error) return <p>{error}</p>
+    if (submitted) return <p>Flashcards completed successfully</p>
 
     return(
         <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">
@@ -87,9 +118,9 @@ export default function Flashcards() {
             {submit && (
                 <div className="bg-elevated-bg w-[70vw] p-6 rounded-2xl my-12">
                     <p className="text-primary-text">How confident do you feel about this topic?</p>
-                    <button className="text-primary-text bg-secondary px-6 py-4 mx-1 rounded-md mt-2 font-bold">Got It</button>
-                    <button className="text-primary-text bg-warning px-6 py-4 mx-1 rounded-md mt-2 font-bold">Shaky</button>
-                    <button className="text-primary-text bg-danger px-6 py-4 mx-1 rounded-md mt-2 font-bold">Lost</button>
+                    <button className="text-primary-text bg-secondary px-6 py-4 mx-1 rounded-md mt-2 font-bold" onClick={() => submitResult('got_it')}>Got It</button>
+                    <button className="text-primary-text bg-warning px-6 py-4 mx-1 rounded-md mt-2 font-bold" onClick={() => submitResult('shaky')}>Shaky</button>
+                    <button className="text-primary-text bg-danger px-6 py-4 mx-1 rounded-md mt-2 font-bold" onClick={() => submitResult('lost')}>Lost</button>
                 </div>
             )}
         </div>
