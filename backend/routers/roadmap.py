@@ -22,6 +22,8 @@ async def get_topics(project_id: UUID, current_user: User = Depends(get_current_
             name=topic.name,
             priority_score=topic.priority_score,
             status=topic.status,
+            headline=topic.headline,
+            summary=topic.summary,
             last_reviewed_at=topic.last_reviewed_at,
             created_at=topic.created_at
         ))
@@ -47,6 +49,8 @@ async def create_topic(new_topic: TopicCreate, project_id: UUID, current_user: U
         name=topic.name,
         priority_score=topic.priority_score,
         status=topic.status,
+        headline=topic.headline,
+        summary= topic.summary,
         last_reviewed_at=topic.last_reviewed_at,
         created_at=topic.created_at
     )
@@ -75,6 +79,8 @@ async def update_topic(topic_id: UUID, project_id: UUID, update_data: TopicUpdat
         name=topic.name,
         priority_score=topic.priority_score,
         status=topic.status,
+        headine= topic.headline,
+        summary=topic.summary,
         last_reviewed_at=topic.last_reviewed_at,
         created_at=topic.created_at
     )

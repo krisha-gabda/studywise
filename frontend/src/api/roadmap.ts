@@ -5,6 +5,7 @@ export function getTopics(projectId: string): Promise<Topic[]> {
     return apiRequest<Topic[]>(`/api/roadmap/topics?project_id=${projectId}`)
 }
 
+// To Do: Update the create and delete topics in both the backend and frontend
 export function createTopics(projectId: string, data: TopicCreate): Promise<Topic> {
       return apiRequest<Topic>(`/api/roadmap/topics?project_id=${projectId}`, { method: 'POST', body: data })
 }

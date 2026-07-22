@@ -4,9 +4,7 @@ import { login, register } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { APIError } from "../api/client";
-import { getProjects } from "../api/projects";
-import { useProjectStore } from "../store/pojectStore";
-import { getTopics } from "../api/roadmap";
+import Loading from "../components/Loading";
 
 export default function Auth() {
     
@@ -26,11 +24,6 @@ export default function Auth() {
     const [ isSubmitting, setIsSubmitting ] = useState(false);
 
     const storeLogin = useAuthStore((state) => state.login);
-    const storeProject = useProjectStore((state) => state.setProjects);
-
-    const projectIds: string[] = [];
-    const projectNames: string[] = [];
-
     const navigate = useNavigate();
 
     const handleChange = (e: any) => {
@@ -86,7 +79,7 @@ export default function Auth() {
     }
 
     if (error) return <p>An Error occured. Please try again.</p>
-    if (isSubmitting) return <p>Loading...</p>
+    if (isSubmitting) return <Loading />
 
     return(
         <div className="bg-page-bg h-screen text-center flex flex-col justify-center items-center">

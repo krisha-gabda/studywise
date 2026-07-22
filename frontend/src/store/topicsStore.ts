@@ -1,0 +1,40 @@
+import { create } from "zustand"
+import type { Topic } from "../types/topic"
+import { persist } from "zustand/middleware"
+
+type TopicsStore = {
+    topics: Topic[],
+    currentTopic: Topic,
+    setTopics: (topics: Topic[]) => void,
+    setCurrentTopic: (currentTopic: Topic) => void,
+}
+
+export const useTopicsStore = create<TopicsStore>()(persist((set) => ({
+    topics: [],
+    currentTopic: {
+        id: '',
+        project_id: '',
+        name: '',
+        priority_score: 0.0,
+        status: '',
+        headline: '',
+        summary: '',
+        last_reviewed_at: '',
+        created_at: ''
+    },
+
+    setTopics(topics: Topic[]) {
+        set({ topics })
+    },
+
+    setCurrentTopic(currentTopic: Topic) {
+        set({ currentTopic })
+    },
+
+}), {
+    name: 'topic-storage',
+    partialize: (state) => ({
+        topics: state.topics,
+        currentTopic: state.currentTopic
+    })
+}))

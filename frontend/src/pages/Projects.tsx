@@ -3,6 +3,9 @@ import { useProjectStore } from "../store/pojectStore"
 import { getProjects } from "../api/projects";
 import { APIError } from "../api/client";
 import { useNavigate } from "react-router-dom";
+import { getTopics } from "../api/roadmap";
+import { useTopicsStore } from "../store/topicsStore";
+import Loading from "../components/Loading";
 
 export default function Projects() {
 
@@ -12,6 +15,24 @@ export default function Projects() {
     const storeProject = useProjectStore((state) => state.setProjects);
     const projects = useProjectStore((state) => state.projects);
     const navigate = useNavigate();
+    const storeTopics = useTopicsStore((state) => (state.setTopics));
+
+    const selectProject = async(project_id: string) => {
+        setLoading(true);
+        try {
+            const repsonse = await getTopics(project_id);
+            storeTopics(repsonse);
+            navigate(`/roadmap/${project_id}`)
+        } catch (err) {
+            if (err instanceof APIError) {
+                setError(err.message);
+            } else {
+                setError('Something went wrong. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         try {
@@ -34,7 +55,7 @@ export default function Projects() {
         }
     }, [])
 
-    if (loading) return <p>Loading...</p>
+    if (loading) return <Loading />
     if (error) return <p>An error occured. Please try again.</p>
 
     return(
@@ -42,9 +63,19 @@ export default function Projects() {
             <h2 className="text-primary-text text-4xl font-bold">Welcome Back</h2>
             <p>Select a project to start learning.</p>
 
-            {/* Create a for loop and display the required project details followed by a project create button and then a project create component. Look into how to create a component like a pop up box or something */}
-
             <div className="flex flex-row gap-2 justify-center items-center">
+
+                <div className="bg-elevated-bg w-72 rounded-md h-48 p-5 flex flex-col items-center justify-center text-center">
+                    <h3 className="text-primary-text text-2xl font-bold">Create New Project</h3>
+                    <button 
+                        className="bg-primary text-primary-text font-bold text-3xl p-4 py-3 mt-3 rounded-full hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                        type='button'
+                        onClick={() => navigate('/projects/new')}
+                    >
+                        +
+                    </button>
+                </div>
+
                 {projects.map((project) => (
                     <div className="bg-card-bg w-72 rounded-md h-48 p-5 flex flex-col items-center justify-center text-center">
                         <h3 className="text-primary-text text-2xl font-bold" key={project.id}>{project.name}</h3>
@@ -52,7 +83,7 @@ export default function Projects() {
                         <button 
                             className="bg-primary text-primary-text px-3 p-2 mt-4 rounded-2xl font-semiboldbold hover:bg-primary-hover transition-all ease-in cursor-pointer" 
                             type="button" 
-                            onClick={() => navigate(`/dashboard/${project.id}`)}
+                            onClick={() => selectProject(project.id)}
                         >
                             View Project
                         </button>
