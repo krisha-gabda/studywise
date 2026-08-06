@@ -5,12 +5,13 @@ from schemas import Flashcard
 from google import genai
 import json
 from uuid import UUID
+from db.database import AsyncSession
 
 settings = get_settings()
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-def generate_flashcards(user_id: UUID, project_id: UUID, topic_name: str):
-    chunks = query_chunks(user_id=str(user_id), project_id=str(project_id), query_text=topic_name, top_k=settings.TOP_K_CHUNKS)
+def generate_flashcards(db: AsyncSession, user_id: UUID, project_id: UUID, topic_name: str):
+    chunks = query_chunks(db=db, user_id=str(user_id), project_id=str(project_id), query_text=topic_name, top_k=settings.TOP_K_CHUNKS)
     context_string = " ".join(chunks)
 
     prompt = build_generate_flashcards_prompt(topic_name=topic_name, context=context_string)

@@ -1,54 +1,48 @@
-import chromadb
-from config import get_settings
-import uuid
+from db.database import AsyncSession
+from models.embedding import Embedding
 from services.embedder import embed_text
+from sqlalchemy import select
+import uuid
 
-settings = get_settings()
-client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
+async def store_chunks(
+        db: AsyncSession,
+        user_id: str,
+        project_id: str,
+        topic_name: str,
+        chunks: list[str],
+        embeddings: list[list[float]]
+) -> None:
+    # Store a list of text chunks and embeddings into the database
+    for chunk_text, embedding_vector in zip(chunks, embeddings):
+        embedding_row = Embedding(
+            id = uuid.uuid4(),
+            user_id = user_id,
+            project_id = project_id,
+            topic_name = topic_name,
+            chunk_text = chunk_text,
+            embedding = embedding_vector
+        )
 
-def get_collection():
-    collection = client.get_or_create_collection(name=settings.CHROMA_COLLECTION_NAME)
-    return collection
+        db.add(embedding_row)
+
+    await db.commit()
 
 
-def store_chunks(user_id: str, project_id: str, topic_name: str, chunks: list[str], embeddings: list[list[float]]):
-    collection = get_collection()
+async def query_chunks(
+        db: AsyncSession,
+        user_id: str,
+        project_id: str,
+        query_text: str,
+        top_k: int = 5,
+) -> list[str]:
+    # Find the most semantically similar text to the query_text scoped to the given project.
+    query_embedding = embed_text(query_text, task_type='RETRIEVAL_QUERY')
 
-    user_id = str(user_id)
-    project_id = str(project_id)
-    topic_name = str(topic_name)
-
-    ids = [f'{user_id}_{project_id}_{topic_name}_{i}_{uuid.uuid4()}' for i in range(len(chunks))]
-    metadatas = [{
-        'user_id': user_id,
-        'project_id': project_id,
-        'topic_name': topic_name
-    } for _ in chunks]
-
-    collection.add(
-        embeddings=embeddings,
-        documents=chunks,
-        metadatas=metadatas,
-        ids=ids
+    result = await db.execute(
+        select(Embedding.chunk_text)
+            .where(Embedding.user_id == user_id, Embedding.project_id == project_id)
+            .order_by(Embedding.embedding.cosine_distance(query_embedding))
+            .limit(top_k)
     )
 
-
-def query_chunks(user_id: str, project_id: str, query_text: str, top_k: int):
-    embeddings = embed_text(text=query_text, task_type='RETRIEVAL_QUERY')
-    collection = get_collection()
-
-    user_id = str(user_id)
-    project_id = str(project_id)
-
-    results = collection.query(
-        query_embeddings=embeddings,
-        n_results=top_k,
-        where={
-            '$and': [
-                {'user_id': user_id},
-                {'project_id': project_id}
-            ]
-        }
-    )
-
-    return results['documents'][0]
+    return result.scalars().all()
