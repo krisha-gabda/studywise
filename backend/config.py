@@ -31,8 +31,8 @@ class Settings(BaseSettings):
 
     # CORS
     ALLOWED_ORIGINS: list[str] = [
-        'http://localhost:5173'         # VITE dev server
-        # Add domain name after deployment
+        'http://localhost:5173',         # VITE dev server
+        'https://studywise-two.vercel.app'
     ]
 
     # Priority Score Constants
