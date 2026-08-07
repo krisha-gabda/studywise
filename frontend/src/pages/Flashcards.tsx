@@ -7,6 +7,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { sessionResult } from "../api/session";
 import { getTopics } from "../api/roadmap";
 import Loading from "../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function Flashcards() {
     const setFlashcards = useStudyStore((state) => state.setFlashcards);
@@ -22,6 +23,8 @@ export default function Flashcards() {
 
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState<null | string>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function flashcardsAPICall() {
@@ -97,9 +100,20 @@ export default function Flashcards() {
         }
     }
 
-    if (loading || flashcards.length === 0) return <Loading />
     if (error) return <p>{error}</p>
-    if (submitted) return <p>Flashcards completed successfully</p>
+    if (loading || flashcards.length === 0) return <Loading />
+    if (submitted) return (
+        <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">
+            <p className="text-primary-text font-bold">Flashcards completed successfully</p>
+            <button 
+                type="button" 
+                className="bg-primary px-8 py-4 font-bold text-primary-text rounded-md ml-auto mr-[10vw] hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                onClick={() => navigate(`/projects/${topic.project_id}/study/${topic.id}`)}
+            >
+                Continue Learning
+            </button>
+        </div>
+    )
 
     return(
         <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">

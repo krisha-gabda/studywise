@@ -113,12 +113,6 @@ class QuizSubmission(BaseModel):
     answers: list[int]          # User's selected answers
 
 
-# Summary
-class SummaryResponse(BaseModel):
-    headline: str
-    summary: str
-
-
 # Session Results (sent after any study mode)
 class SessionResultCreate(BaseModel):
     topic_id: UUID

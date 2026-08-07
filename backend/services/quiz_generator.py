@@ -10,8 +10,8 @@ from db.database import AsyncSession
 settings = get_settings()
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-def generate_quiz(db: AsyncSession, user_id: UUID, project_id: UUID, topic_name: str):
-    chunks = query_chunks(db=db, user_id=str(user_id), project_id=str(project_id), query_text=topic_name, top_k=settings.TOP_K_CHUNKS)
+async def generate_quiz(db: AsyncSession, user_id: UUID, project_id: UUID, topic_name: str):
+    chunks = await query_chunks(db=db, user_id=str(user_id), project_id=str(project_id), query_text=topic_name, top_k=settings.TOP_K_CHUNKS)
     context_string = " ".join(chunks)
 
     prompt = build_generate_quiz_prompt(topic_name=topic_name, context=context_string)

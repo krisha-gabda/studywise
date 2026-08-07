@@ -25,8 +25,3 @@ export interface QuizSubmission {
     topic_id: string
     answers: number[]
 }
-
-export interface SummaryResponse {
-    headline: string
-    summary: string
-}

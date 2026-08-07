@@ -6,6 +6,7 @@ import { useStudyStore } from "../store/studyStore";
 import { sessionResult } from "../api/session";
 import { getTopics } from "../api/roadmap";
 import Loading from "../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function Quiz() {
     const topic = useTopicsStore((state) => state.currentTopic);
@@ -26,6 +27,8 @@ export default function Quiz() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<null | string>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         localStorage.setItem(answersKey, JSON.stringify(answers));
@@ -113,7 +116,18 @@ export default function Quiz() {
     if (error) return <p>{error}</p>
     if (loading || quiz.length === 0) return <Loading />
 
-    if (submitted) return <p>Quiz submitted successfully</p>
+    if (submitted) return (
+        <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">
+            <p className="text-primary-text font-bold">Quiz submitted successfully</p>
+            <button 
+                type="button" 
+                className="bg-primary px-8 py-4 font-bold text-primary-text rounded-md ml-auto mr-[10vw] hover:bg-primary-hover transition-all ease-in cursor-pointer"
+                onClick={() => navigate(`/projects/${topic.project_id}/study/${topic.id}`)}
+            >
+                Continue Learning
+            </button>
+        </div>
+    )
 
     return (
         <div className="bg-page-bg min-h-screen text-center flex flex-col items-center">
