@@ -15,10 +15,6 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
 
-    # ChromaDB
-    CHROMA_PATH: str = './chroma_db'
-    CHROMA_COLLECTION_NAME: str = 'studywwise_notes'
-
     # JWT Auth
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"

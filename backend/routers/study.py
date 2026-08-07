@@ -21,7 +21,7 @@ async def flashcards(topic_id: UUID, project_id: UUID, current_user: User = Depe
         raise HTTPException(status_code=404, detail='Not found or Not owned')
     
     try:
-        flashcards = generate_flashcards(user_id=current_user.id, project_id=project_id, topic_name=topic.name)
+        flashcards = generate_flashcards(db=db, user_id=current_user.id, project_id=project_id, topic_name=topic.name)
     except Exception as e:
         raise HTTPException(status_code=503, detail=f'Flashcard generation failed, please try again: {e}')
     
@@ -41,7 +41,7 @@ async def quiz(topic_id: UUID, project_id: UUID, current_user: User = Depends(ge
         raise HTTPException(status_code=404, detail='Not found or not owned')
     
     try:
-        quiz = generate_quiz(user_id=current_user.id, project_id=project_id, topic_name=topic.name)
+        quiz = generate_quiz(db=db, user_id=current_user.id, project_id=project_id, topic_name=topic.name)
     except Exception as e:
         raise HTTPException(status_code=503, detail=f'Quiz generation failed, please try again: {e}')
 

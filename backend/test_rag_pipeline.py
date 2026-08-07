@@ -9,13 +9,16 @@ This does NOT touch FastAPI, the database, or any routes.
 It's just here to catch bugs in isolation before wiring things together.
 """
 
+import asyncio
+
+from db.database import AsyncSessionLocal
 from services.chunker import chunk_text
 from services.embedder import embed_text, embed_chunks
 from services.vector_store import store_chunks, query_chunks
 from services.topic_extractor import extract_topics
 
 
-def run_test():
+async def run_test():
     print("=" * 50)
     print("STEP 1 — Chunking")
     print("=" * 50)
@@ -67,7 +70,7 @@ def run_test():
         return
 
     print("\n" + "=" * 50)
-    print("STEP 4 — Storing in ChromaDB")
+    print("STEP 4 — Storing in Vector Database")
     print("=" * 50)
 
     test_user_id = "test-user-123"
@@ -75,31 +78,35 @@ def run_test():
     test_topic_name = "Neural Networks"
 
     try:
-        store_chunks(
-            user_id=test_user_id,
-            project_id=test_project_id,
-            topic_name=test_topic_name,
-            chunks=chunks,
-            embeddings=all_vectors
-        )
+        async with AsyncSessionLocal() as db:
+            await store_chunks(
+                db=db,
+                user_id=test_user_id,
+                project_id=test_project_id,
+                topic_name=test_topic_name,
+                chunks=chunks,
+                embeddings=all_vectors,
+            )
         print("Stored successfully")
     except Exception as e:
         print(f"FAILED on store_chunks: {e}")
         return
 
     print("\n" + "=" * 50)
-    print("STEP 5 — Querying ChromaDB")
+    print("STEP 5 — Querying in Vector Database")
     print("=" * 50)
 
     query = "How does backpropagation work?"
 
     try:
-        results = query_chunks(
-            user_id=test_user_id,
-            project_id=test_project_id,
-            query_text=query,
-            top_k=3
-        )
+        async with AsyncSessionLocal() as db:
+            results = await query_chunks(
+                db=db,
+                user_id=test_user_id,
+                project_id=test_project_id,
+                query_text=query,
+                top_k=3,
+            )
         print(f"Query: '{query}'")
         print(f"Number of results: {len(results)}")
         for i, r in enumerate(results):
@@ -113,12 +120,14 @@ def run_test():
     print("=" * 50)
 
     try:
-        other_user_results = query_chunks(
-            user_id="some-other-user-999",
-            project_id=test_project_id,
-            query_text=query,
-            top_k=3
-        )
+        async with AsyncSessionLocal() as db:
+            other_user_results = await query_chunks(
+                db=db,
+                user_id="some-other-user-999",
+                project_id=test_project_id,
+                query_text=query,
+                top_k=3,
+            )
         print(f"Results for different user: {len(other_user_results)} (should be 0)")
         if len(other_user_results) != 0:
             print("WARNING — user filtering may not be working correctly")
@@ -142,4 +151,4 @@ def run_test():
 
 
 if __name__ == "__main__":
-    run_test()
+    asyncio.run(run_test())

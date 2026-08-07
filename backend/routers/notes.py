@@ -42,8 +42,8 @@ async def upload(file: UploadFile, project_id: UUID, current_user: User = Depend
     chunks = chunk_text(text=file_text, chunk_size=settings.CHUNK_SIZE, overlap=settings.CHUNK_OVERLAP)
     embeddings = embed_chunks(chunks=chunks)
 
-    # Store in ChromaDB
-    store_chunks(user_id=str(current_user.id), topic_name='random_topic', chunks=chunks, embeddings=embeddings, project_id=project_id) # Placeholder for topic_name. Change later
+    # Store in vector database
+    store_chunks(db=db, user_id=str(current_user.id), topic_name='random_topic', chunks=chunks, embeddings=embeddings, project_id=project_id) # Placeholder for topic_name. Change later
 
     # Save topics in database
     for topic in topics:

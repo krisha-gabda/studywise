@@ -1,4 +1,4 @@
-# studywise
+# StudyWise
 
 **Adaptive revision assistant that transforms your notes into a personalised study roadmap using Retrieval-Augmented Generation (RAG).**
 
@@ -7,8 +7,7 @@ StudyWise helps students revise more efficiently by transforming uploaded notes 
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169e1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-vector%20store-6E56CF)](https://www.trychroma.com)
+[![PostgreSQL + pgvector](https://img.shields.io/badge/PostgreSQL-4169e1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![Gemini](https://img.shields.io/badge/Gemini%20API-generation%20%2B%20embeddings-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -135,8 +134,7 @@ This approach:
 |---|---|
 | **Frontend** | React 19, TypeScript, Vite, Tailwind CSS 4, Zustand, React Router 7 |
 | **Backend** | FastAPI (Async), SQLAlchemy (Async), Alembic |
-| **Database** | PostgreSQL, Supabase |
-| **Vector Database** | ChromaDB |
+| **Database** | PostgreSQL (pgvector extention), Supabase |
 | **AI** | Google Gemini API (Generation), Gemini Embeddings |
 | **Authentication** | JWT, Bcrypt |
 
@@ -153,35 +151,34 @@ This approach:
                              ▼
                      Topic Extraction
                              │
-              ┌──────────────┴──────────────┐
-              ▼                             ▼
-      PostgreSQL                     Chunk & Embed
- (Users, Projects, Topics)                │
-                                           ▼
-                                      ChromaDB
-                                  (Vector Store)
-                                           │
-                                           ▼
-                                   Similarity Search
-                                           │
-                                           ▼
-                                    Retrieved Chunks
-                                           │
-                                           ▼
-                                    Gemini LLM
-                                           │
+                             ▼
+                     Chunk & Embed
+                             │
+                             ▼
+                        PostgreSQL
+        (Users, Projects, Topics, Chunks + Embeddings)
+                             │
+                             ▼
+                  pgvector Similarity Search
+                             │
+                             ▼
+                    Retrieved Chunks
+                             │
+                             ▼
+                     Gemini LLM
+                             │
                      ┌───────────────┼───────────────┐
                      ▼               ▼               ▼
                Flashcards         Quizzes        Summaries
-                                           │
-                                           ▼
-                                 Study Session Results
-                                           │
-                                           ▼
-                                   Priority Engine
-                                           │
-                                           ▼
-                                  Adaptive Roadmap
+                                     │
+                                     ▼
+                           Study Session Results
+                                     │
+                                     ▼
+                             Priority Engine
+                                     │
+                                     ▼
+                            Adaptive Roadmap
 ```
 
 # Project Structure
